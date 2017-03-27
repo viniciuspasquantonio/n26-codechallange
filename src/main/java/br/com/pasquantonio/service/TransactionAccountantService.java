@@ -23,4 +23,17 @@ public class TransactionAccountantService {
 			
 	}
 
+	public Statistic account(Statistic recentStatistic, Statistic statistic) {
+		if(recentStatistic.getMax() < statistic.getMax()){
+			recentStatistic.setMax(statistic.getMax());
+		}
+		if(recentStatistic.getMin() > statistic.getMin()){
+			recentStatistic.setMin(statistic.getMin());
+		}
+		recentStatistic.setSum(recentStatistic.getSum() + statistic.getSum());		
+		recentStatistic.setCount(recentStatistic.getCount()+statistic.getCount());
+		recentStatistic.setAvg(recentStatistic.getSum()/recentStatistic.getCount());
+		return recentStatistic;
+	}
+
 }

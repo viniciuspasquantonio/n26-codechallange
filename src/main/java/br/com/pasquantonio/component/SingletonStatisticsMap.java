@@ -14,7 +14,7 @@ public class SingletonStatisticsMap {
 	
 	public static ConcurrentNavigableMap<Long, Statistic> getInstance(){
 		if(statisticsMap == null){
-			statisticsMap = new ConcurrentSkipListMap();
+			statisticsMap = new ConcurrentSkipListMap<Long, Statistic>();
 		}
 		return statisticsMap;
 	}

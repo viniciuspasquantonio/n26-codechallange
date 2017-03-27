@@ -124,4 +124,36 @@ public class StatisticsServiceTest {
 		singletonStatisticsMap.getInstance().clear();
 	}
 	
+	@Test
+	public void shoulRetriveStatisticsFromPast60Seconds(){
+		long now = Instant.now().toEpochMilli();
+		long tenSecondsAgo = now - 10000;
+		long sixtySecondsAgo = now - (60 * 1000);
+		long twoMinutesAgo = now - (120 *1000);
+		Transaction transaction = new Transaction(now,50D);
+		Transaction secondTransaction = new Transaction(now,100D);
+		Transaction thirdTransaction = new Transaction(now,10D);
+		Transaction fourthTransaction = new Transaction(tenSecondsAgo,30D);
+		Transaction fifthTransaction = new Transaction(tenSecondsAgo,90D);
+		Transaction twoMinutesAgoTransaction = new Transaction(twoMinutesAgo,90D);
+		
+		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
+		statisticsService.postTransaction(secondTransaction,singletonStatisticsMap.getInstance());
+		statisticsService.postTransaction(thirdTransaction,singletonStatisticsMap.getInstance());
+		statisticsService.postTransaction(fourthTransaction,singletonStatisticsMap.getInstance());
+		statisticsService.postTransaction(fifthTransaction,singletonStatisticsMap.getInstance());
+		statisticsService.postTransaction(twoMinutesAgoTransaction,singletonStatisticsMap.getInstance());
+		
+		Statistic pastSixtySecondsStatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(sixtySecondsAgo, singletonStatisticsMap.getInstance());
+		
+		assertEquals(pastSixtySecondsStatistic.getAvg(), 56,0);
+		assertEquals(pastSixtySecondsStatistic.getMax(), 100,0);
+		assertEquals(pastSixtySecondsStatistic.getMin(), 10,0);
+		assertEquals(pastSixtySecondsStatistic.getSum(), 280,0);
+		assertEquals(pastSixtySecondsStatistic.getCount(), 5,0);
+		
+		singletonStatisticsMap.getInstance().clear();
+	
+	}
+	
 }
