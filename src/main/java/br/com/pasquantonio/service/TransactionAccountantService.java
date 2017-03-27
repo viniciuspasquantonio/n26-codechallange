@@ -16,12 +16,8 @@ public class TransactionAccountantService {
 			statistic.setMin(transaction.getAmount());
 		}
 		statistic.setSum(statistic.getSum() + transaction.getAmount());		
-		if(statistic.getCount() == 0){
-			statistic.setAvg(transaction.getAmount());
-		}else{
-			statistic.setAvg((statistic.getAvg()+transaction.getAmount())/2);
-		}
 		statistic.setCount(statistic.getCount()+1);
+		statistic.setAvg(statistic.getSum()/statistic.getCount());
 		return statistic;
 		
 			
