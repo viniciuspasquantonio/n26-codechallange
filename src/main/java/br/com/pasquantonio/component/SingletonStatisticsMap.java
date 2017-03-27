@@ -10,11 +10,12 @@ import br.com.pasquantonio.model.Statistic;
 @Component
 public class SingletonStatisticsMap {
 
+	private SingletonStatisticsMap() {}
 	static ConcurrentNavigableMap<Long, Statistic> statisticsMap = null;
 	
 	public static ConcurrentNavigableMap<Long, Statistic> getInstance(){
 		if(statisticsMap == null){
-			statisticsMap = new ConcurrentSkipListMap<Long, Statistic>();
+			statisticsMap = new ConcurrentSkipListMap<>();
 		}
 		return statisticsMap;
 	}

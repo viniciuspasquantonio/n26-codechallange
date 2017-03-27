@@ -9,6 +9,8 @@ public class Transaction {
 	@Min(0)
 	private double amount;
 	
+	public Transaction() {}
+	
 	public Transaction(long time, double amount) {
 		this.time = time;
 		this.amount = amount;
