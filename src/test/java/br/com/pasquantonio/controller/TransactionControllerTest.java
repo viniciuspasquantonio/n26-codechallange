@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.pasquantonio.component.SingletonStatisticsMap;
 import br.com.pasquantonio.model.Transaction;
 
 @RunWith(SpringRunner.class)
@@ -24,6 +26,9 @@ public class TransactionControllerTest {
 
 	@LocalServerPort
 	private int port;
+	
+	@Autowired
+	private SingletonStatisticsMap singletonStatisticsMap;
 	
 	private String transactionAsString;
 	@Before
@@ -45,6 +50,7 @@ public class TransactionControllerTest {
 			.post("/transactions")
 		.then()
 			.statusCode(HttpStatus.SC_CREATED);
+		singletonStatisticsMap.getInstance().clear();
 	}
 	
 	@Test
@@ -66,5 +72,6 @@ public class TransactionControllerTest {
 			.post("/transactions")
 		.then()
 			.statusCode(HttpStatus.SC_NO_CONTENT);
+		singletonStatisticsMap.getInstance().clear();
 	}
 }
