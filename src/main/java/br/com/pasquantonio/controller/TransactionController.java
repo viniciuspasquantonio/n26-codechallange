@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.pasquantonio.component.SingletonStatisticsMap;
 import br.com.pasquantonio.model.Transaction;
 import br.com.pasquantonio.service.StatisticsService;
+import br.com.pasquantonio.service.TimeIntervalService;
 
 @RestController
 @RequestMapping("/")
@@ -24,8 +25,14 @@ public class TransactionController {
 	@Autowired
 	private SingletonStatisticsMap singletonStatisticsMap;
 	
+	@Autowired
+	private TimeIntervalService timeIntervalService;
+	
 	@RequestMapping(value = "/transactions", method = RequestMethod.POST, consumes="application/json")
 	public ResponseEntity<Object> update(@RequestBody @Valid Transaction transaction) {
+		if(!timeIntervalService.isInTimeInterval(transaction.getTime())){
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 		ResponseEntity<Object> responseEntity;
 		if(singletonStatisticsMap.getInstance().containsKey(transaction.getTime())){
 			responseEntity = new ResponseEntity<>(HttpStatus.NO_CONTENT);

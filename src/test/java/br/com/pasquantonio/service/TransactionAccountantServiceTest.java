@@ -22,7 +22,7 @@ public class TransactionAccountantServiceTest {
 	
 	@Test
 	public void statisticShouldBeEqualToAccountantedTransaction(){
-		Transaction transaction = new Transaction(Instant.now().getEpochSecond(),100D);
+		Transaction transaction = new Transaction(Instant.now().toEpochMilli(),100D);
 		Statistic statistic = transactionAccountantService.account(new Statistic(),transaction);
 		
 		assertEquals(statistic.getAvg(), transaction.getAmount(),0);
@@ -35,7 +35,7 @@ public class TransactionAccountantServiceTest {
 	
 	@Test
 	public void transactonShouldBeAccountantedToExistingStatistic(){
-		Transaction transaction = new Transaction(Instant.now().getEpochSecond(),100D);
+		Transaction transaction = new Transaction(Instant.now().toEpochMilli(),100D);
 		Statistic statistic = new Statistic();
 		statistic.setAvg(500);
 		statistic.setMax(500);

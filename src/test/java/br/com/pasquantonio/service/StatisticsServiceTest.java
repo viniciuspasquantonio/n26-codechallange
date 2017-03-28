@@ -30,6 +30,9 @@ public class StatisticsServiceTest {
 	@Autowired
 	private SingletonStatisticsMap singletonStatisticsMap;
 	
+	@Autowired
+	private TimeIntervalService timeIntervalService;
+	
 	@Test
 	public void shouldAccountTransactionToEmptyStatistics(){
 		Transaction transaction = new Transaction(Instant.now().toEpochMilli(),50D);
@@ -101,7 +104,7 @@ public class StatisticsServiceTest {
 	@Test
 	public void shouldNotAccountTransactionsWithDifferentTime(){
 		long now = Instant.now().toEpochMilli();
-		long tenSecondsAgo = now - 100000;
+		long tenSecondsAgo = Instant.now().minusSeconds(10L).toEpochMilli();
 		Transaction transaction = new Transaction(now,50D);
 		Transaction secondTransaction = new Transaction(now,100D);
 		Transaction thirdTransaction = new Transaction(now,10D);
@@ -127,9 +130,8 @@ public class StatisticsServiceTest {
 	@Test
 	public void shoulRetriveStatisticsFromPast60Seconds(){
 		long now = Instant.now().toEpochMilli();
-		long tenSecondsAgo = now - 10000;
-		long sixtySecondsAgo = now - (60 * 1000);
-		long twoMinutesAgo = now - (120 *1000);
+		long tenSecondsAgo = Instant.now().minusSeconds(10L).toEpochMilli();
+		long twoMinutesAgo = Instant.now().minusSeconds(120L).toEpochMilli();
 		Transaction transaction = new Transaction(now,50D);
 		Transaction secondTransaction = new Transaction(now,100D);
 		Transaction thirdTransaction = new Transaction(now,10D);
@@ -143,8 +145,7 @@ public class StatisticsServiceTest {
 		statisticsService.postTransaction(fourthTransaction,singletonStatisticsMap.getInstance());
 		statisticsService.postTransaction(fifthTransaction,singletonStatisticsMap.getInstance());
 		statisticsService.postTransaction(twoMinutesAgoTransaction,singletonStatisticsMap.getInstance());
-		
-		Statistic pastSixtySecondsStatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(sixtySecondsAgo, singletonStatisticsMap.getInstance());
+		Statistic pastSixtySecondsStatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(singletonStatisticsMap.getInstance());
 		
 		assertEquals(pastSixtySecondsStatistic.getAvg(), 56,0);
 		assertEquals(pastSixtySecondsStatistic.getMax(), 100,0);

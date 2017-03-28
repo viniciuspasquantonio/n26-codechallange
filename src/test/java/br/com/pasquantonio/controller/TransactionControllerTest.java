@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.pasquantonio.component.SingletonStatisticsMap;
 import br.com.pasquantonio.model.Transaction;
+import br.com.pasquantonio.service.TimeIntervalService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,10 +31,15 @@ public class TransactionControllerTest {
 	@Autowired
 	private SingletonStatisticsMap singletonStatisticsMap;
 	
+	@Autowired
+	private TimeIntervalService timeIntervalService;
+	
+	
 	private String transactionAsString;
+	
 	@Before
 	public void setup() {
-		Transaction transaction = new Transaction(Instant.now().getEpochSecond(), 100D);
+		Transaction transaction = new Transaction(Instant.now().toEpochMilli(), 100D);
 		try {
 			transactionAsString = new ObjectMapper().writeValueAsString(transaction);
 		} catch (JsonProcessingException e) {
@@ -72,6 +78,22 @@ public class TransactionControllerTest {
 			.post("/transactions")
 		.then()
 			.statusCode(HttpStatus.SC_NO_CONTENT);
+		singletonStatisticsMap.getInstance().clear();
+	}
+	
+	@Test
+	public void shouldReturnNoContentWhenTransactionTimeIsNotInTimeInterval() throws JsonProcessingException {
+		Transaction transaction = new Transaction(Instant.now().minusSeconds(100).toEpochMilli(), 100D);
+		
+		given()
+			.port(port)
+			.contentType("application/json")
+			.body(new ObjectMapper().writeValueAsString(transaction))
+		.when()
+			.post("/transactions")
+		.then()
+			.statusCode(HttpStatus.SC_NO_CONTENT);
+		
 		singletonStatisticsMap.getInstance().clear();
 	}
 }

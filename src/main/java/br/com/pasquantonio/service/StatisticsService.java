@@ -1,8 +1,5 @@
 package br.com.pasquantonio.service;
 
-import java.time.Instant;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentNavigableMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +12,9 @@ import br.com.pasquantonio.model.Transaction;
 public class StatisticsService {
 	@Autowired
 	private TransactionAccountantService transactionAccountantService;
+	
+	@Autowired
+	private TimeIntervalService timeIntervalService;
 
 
 	public void postTransaction(Transaction transaction, ConcurrentNavigableMap<Long, Statistic> statisticsMap) {
@@ -27,8 +27,8 @@ public class StatisticsService {
 	}
 
 
-	public Statistic retriveAllStatisticsWithTimeGreaterThan(long timeGreater, ConcurrentNavigableMap<Long, Statistic> statisticsMap) {
-		ConcurrentNavigableMap<Long, Statistic> recentStatisticsMap = statisticsMap.tailMap(timeGreater);
+	public Statistic retriveAllStatisticsWithTimeGreaterThan(ConcurrentNavigableMap<Long, Statistic> statisticsMap) {
+		ConcurrentNavigableMap<Long, Statistic> recentStatisticsMap = statisticsMap.tailMap(timeIntervalService.getGreaterTimeWithinTimeInterval());
 		Statistic recentStatistic = new Statistic();
 		for (Statistic statistic : recentStatisticsMap.values()) {
 			recentStatistic = transactionAccountantService.account(recentStatistic, statistic);

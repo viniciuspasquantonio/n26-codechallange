@@ -21,7 +21,6 @@ import br.com.pasquantonio.service.StatisticsService;
 @RequestMapping("/")
 public class StatisticsController {
 	
-	private static final int SIXTY_SECONDS = 60000;
 	@Autowired	
 	private StatisticsService statisticsService;
 	
@@ -30,8 +29,7 @@ public class StatisticsController {
 	
 	@RequestMapping(value = "/statistics", method = RequestMethod.GET, consumes="application/json",produces="application/json")
 	public ResponseEntity<Statistic> retrivePastSixtySecondsStatistics() {
-		long sixtySecondsAgo = Instant.now().getEpochSecond() - SIXTY_SECONDS ;
-		Statistic pastSixtySecondsSatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(sixtySecondsAgo, singletonStatisticsMap.getInstance());
+		Statistic pastSixtySecondsSatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(singletonStatisticsMap.getInstance());
 		return new ResponseEntity<>(pastSixtySecondsSatistic,HttpStatus.OK);
 	}
 

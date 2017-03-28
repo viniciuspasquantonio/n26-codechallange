@@ -38,7 +38,7 @@ public class StatisticControllerTest {
 
 	@Before
 	public void setup() {
-		Transaction mostRecentTransaction = new Transaction(Instant.now().getEpochSecond(), 100D);
+		Transaction mostRecentTransaction = new Transaction(Instant.now().toEpochMilli(), 100D);
 		try {
 			transactionAsString = new ObjectMapper().writeValueAsString(mostRecentTransaction);
 		} catch (JsonProcessingException e) {
@@ -72,7 +72,7 @@ public class StatisticControllerTest {
 	
 	@Test
 	public void shouldReturnStatisticFromTransactionWithSameTime() throws IOException {
-		long now = Instant.now().getEpochSecond();
+		long now = Instant.now().toEpochMilli();
 		Transaction firstTransaction = new Transaction(now, 100D);
 		Transaction secondTransaction = new Transaction(now, 200D);
 		Transaction thirdTransaction = new Transaction(now, 300.50D);
@@ -95,8 +95,8 @@ public class StatisticControllerTest {
 	
 	@Test
 	public void shouldReturnStatisticFromTransactionWithDifferentTimes() throws IOException {
-		long now = Instant.now().getEpochSecond();
-		long tenSecondsAgo = Instant.now().getEpochSecond() - 10000;
+		long now = Instant.now().toEpochMilli();
+		long tenSecondsAgo = Instant.now().minusSeconds(10L).toEpochMilli();
 		Transaction firstTransaction = new Transaction(now, 100D);
 		Transaction secondTransaction = new Transaction(now, 200D);
 		Transaction thirdTransaction = new Transaction(now, 300D);
@@ -123,9 +123,9 @@ public class StatisticControllerTest {
 	
 	@Test
 	public void shouldNotAccountStatisticWithTimeOlderThanSixtySeconds() throws IOException {
-		long now = Instant.now().getEpochSecond();
-		long tenSecondsAgo = Instant.now().getEpochSecond() - 10000;
-		long twoMinutesAgo = Instant.now().getEpochSecond() - 120000;
+		long now = Instant.now().toEpochMilli();
+		long tenSecondsAgo = Instant.now().minusSeconds(10L).toEpochMilli();
+		long twoMinutesAgo =  Instant.now().minusSeconds(120L).toEpochMilli();
 		Transaction firstTransaction = new Transaction(now, 100D);
 		Transaction secondTransaction = new Transaction(now, 200D);
 		Transaction thirdTransaction = new Transaction(now, 300D);
@@ -138,7 +138,7 @@ public class StatisticControllerTest {
 		callPostTransaction(new ObjectMapper().writeValueAsString(thirdTransaction),HttpStatus.SC_NO_CONTENT);
 		callPostTransaction(new ObjectMapper().writeValueAsString(fourthTransaction),HttpStatus.SC_CREATED);
 		callPostTransaction(new ObjectMapper().writeValueAsString(fifthTransaction),HttpStatus.SC_NO_CONTENT);
-		callPostTransaction(new ObjectMapper().writeValueAsString(twoMinutesOlderTransaction),HttpStatus.SC_CREATED);
+		callPostTransaction(new ObjectMapper().writeValueAsString(twoMinutesOlderTransaction),HttpStatus.SC_NO_CONTENT);
 
 		Response response = getStatisticsEndPoint();
 		Statistic statistic = new ObjectMapper().readValue(response.getBody().asString(), Statistic.class);
