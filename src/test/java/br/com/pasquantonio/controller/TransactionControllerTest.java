@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.pasquantonio.component.SingletonStatisticsMap;
+import br.com.pasquantonio.component.StatisticsComponent;
 import br.com.pasquantonio.model.Transaction;
 import br.com.pasquantonio.service.TimeIntervalService;
 
@@ -29,7 +29,7 @@ public class TransactionControllerTest {
 	private int port;
 	
 	@Autowired
-	private SingletonStatisticsMap singletonStatisticsMap;
+	private StatisticsComponent statisticsComponent;
 	
 	@Autowired
 	private TimeIntervalService timeIntervalService;
@@ -56,7 +56,7 @@ public class TransactionControllerTest {
 			.post("/transactions")
 		.then()
 			.statusCode(HttpStatus.SC_CREATED);
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -78,7 +78,7 @@ public class TransactionControllerTest {
 			.post("/transactions")
 		.then()
 			.statusCode(HttpStatus.SC_NO_CONTENT);
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -94,6 +94,6 @@ public class TransactionControllerTest {
 		.then()
 			.statusCode(HttpStatus.SC_NO_CONTENT);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 }

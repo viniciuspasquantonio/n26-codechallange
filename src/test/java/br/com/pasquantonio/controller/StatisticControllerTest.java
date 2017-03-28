@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.response.Response;
 
-import br.com.pasquantonio.component.SingletonStatisticsMap;
+import br.com.pasquantonio.component.StatisticsComponent;
 import br.com.pasquantonio.model.Statistic;
 import br.com.pasquantonio.model.Transaction;
 
@@ -34,7 +34,7 @@ public class StatisticControllerTest {
 	private String transactionAsString;
 	
 	@Autowired
-	private SingletonStatisticsMap singletonStatisticsMap;
+	private StatisticsComponent statisticsComponent;
 
 	@Before
 	public void setup() {
@@ -66,7 +66,7 @@ public class StatisticControllerTest {
 		assertEquals(statistic.getSum(), 100D,0);
 		assertEquals(statistic.getCount(), 1,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 		
 	}
 	
@@ -90,7 +90,7 @@ public class StatisticControllerTest {
 		assertEquals(statistic.getSum(), 600.50,0);
 		assertEquals(statistic.getCount(), 3,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -118,7 +118,7 @@ public class StatisticControllerTest {
 		assertEquals(statistic.getSum(), 800,0);
 		assertEquals(statistic.getCount(), 5,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -149,7 +149,7 @@ public class StatisticControllerTest {
 		assertEquals(statistic.getSum(), 800,0);
 		assertEquals(statistic.getCount(), 5,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 
 	private void callPostTransaction(String transactionAsString,int httpStatusCode) {

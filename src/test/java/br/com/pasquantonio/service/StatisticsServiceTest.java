@@ -1,14 +1,11 @@
 package br.com.pasquantonio.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
-import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import br.com.pasquantonio.component.SingletonStatisticsMap;
+import br.com.pasquantonio.component.StatisticsComponent;
 import br.com.pasquantonio.model.Statistic;
 import br.com.pasquantonio.model.Transaction;
 
@@ -25,10 +22,7 @@ import br.com.pasquantonio.model.Transaction;
 public class StatisticsServiceTest {
 
 	@Autowired
-	private StatisticsService statisticsService;
-	
-	@Autowired
-	private SingletonStatisticsMap singletonStatisticsMap;
+	private StatisticsComponent statisticsComponent;
 	
 	@Autowired
 	private TimeIntervalService timeIntervalService;
@@ -36,16 +30,16 @@ public class StatisticsServiceTest {
 	@Test
 	public void shouldAccountTransactionToEmptyStatistics(){
 		Transaction transaction = new Transaction(Instant.now().toEpochMilli(),50D);
-		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
-		assertTrue(singletonStatisticsMap.getInstance().containsKey(transaction.getTime()));
-		Statistic statistic = singletonStatisticsMap.getInstance().get(transaction.getTime());
+		statisticsComponent.postTransaction(transaction);
+		assertTrue(statisticsComponent.containsKey(transaction.getTime()));
+		Statistic statistic = statisticsComponent.get(transaction.getTime());
 		assertEquals(statistic.getAvg(), transaction.getAmount(),0);
 		assertEquals(statistic.getMax(), transaction.getAmount(),0);
 		assertEquals(statistic.getMin(), transaction.getAmount(),0);
 		assertEquals(statistic.getSum(), transaction.getAmount(),0);
 		assertEquals(statistic.getCount(), 1,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	
@@ -60,20 +54,20 @@ public class StatisticsServiceTest {
 		accountedStatistic.setMin(10);
 		accountedStatistic.setSum(250);
 		accountedStatistic.setCount(5);
-		singletonStatisticsMap.getInstance().put(transaction.getTime(), accountedStatistic);
+		statisticsComponent.put(transaction.getTime(), accountedStatistic);
+		StatisticsComponent statisticsComponentFake = mock(StatisticsComponent.class);
 		
+		statisticsComponent.postTransaction(transaction);
 		
-		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
-		
-		assertTrue(singletonStatisticsMap.getInstance().containsKey(transaction.getTime()));
-		Statistic statistic = singletonStatisticsMap.getInstance().get(transaction.getTime());
+		assertTrue(statisticsComponent.containsKey(transaction.getTime()));
+		Statistic statistic = statisticsComponent.get(transaction.getTime());
 		assertEquals(statistic.getAvg(), 50,0);
 		assertEquals(statistic.getMax(), 50,0);
 		assertEquals(statistic.getMin(), 10,0);
 		assertEquals(statistic.getSum(), 300,0);
 		assertEquals(statistic.getCount(), 6,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -85,20 +79,20 @@ public class StatisticsServiceTest {
 		Transaction fourthTransaction = new Transaction(now,30D);
 		Transaction fifthTransaction = new Transaction(now,90D);
 		
-		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(secondTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(thirdTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fourthTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fifthTransaction,singletonStatisticsMap.getInstance());
+		statisticsComponent.postTransaction(transaction);
+		statisticsComponent.postTransaction(secondTransaction);
+		statisticsComponent.postTransaction(thirdTransaction);
+		statisticsComponent.postTransaction(fourthTransaction);
+		statisticsComponent.postTransaction(fifthTransaction);
 		
-		Statistic statistic = singletonStatisticsMap.getInstance().get(now);
+		Statistic statistic = statisticsComponent.get(now);
 		assertEquals(statistic.getAvg(), 56,0);
 		assertEquals(statistic.getMax(), 100,0);
 		assertEquals(statistic.getMin(), 10,0);
 		assertEquals(statistic.getSum(), 280,0);
 		assertEquals(statistic.getCount(), 5,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -111,20 +105,20 @@ public class StatisticsServiceTest {
 		Transaction fourthTransaction = new Transaction(tenSecondsAgo,30D);
 		Transaction fifthTransaction = new Transaction(tenSecondsAgo,90D);
 		
-		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(secondTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(thirdTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fourthTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fifthTransaction,singletonStatisticsMap.getInstance());
+		statisticsComponent.postTransaction(transaction);
+		statisticsComponent.postTransaction(secondTransaction);
+		statisticsComponent.postTransaction(thirdTransaction);
+		statisticsComponent.postTransaction(fourthTransaction);
+		statisticsComponent.postTransaction(fifthTransaction);
 		
-		Statistic statistic = singletonStatisticsMap.getInstance().get(now);
+		Statistic statistic = statisticsComponent.get(now);
 		assertEquals(statistic.getAvg(), 53.3333,0.0001);
 		assertEquals(statistic.getMax(), 100,0);
 		assertEquals(statistic.getMin(), 10,0);
 		assertEquals(statistic.getSum(), 160,0);
 		assertEquals(statistic.getCount(), 3,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	}
 	
 	@Test
@@ -139,13 +133,13 @@ public class StatisticsServiceTest {
 		Transaction fifthTransaction = new Transaction(tenSecondsAgo,90D);
 		Transaction twoMinutesAgoTransaction = new Transaction(twoMinutesAgo,90D);
 		
-		statisticsService.postTransaction(transaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(secondTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(thirdTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fourthTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(fifthTransaction,singletonStatisticsMap.getInstance());
-		statisticsService.postTransaction(twoMinutesAgoTransaction,singletonStatisticsMap.getInstance());
-		Statistic pastSixtySecondsStatistic = statisticsService.retriveAllStatisticsWithTimeGreaterThan(singletonStatisticsMap.getInstance());
+		statisticsComponent.postTransaction(transaction);
+		statisticsComponent.postTransaction(secondTransaction);
+		statisticsComponent.postTransaction(thirdTransaction);
+		statisticsComponent.postTransaction(fourthTransaction);
+		statisticsComponent.postTransaction(fifthTransaction);
+		statisticsComponent.postTransaction(twoMinutesAgoTransaction);
+		Statistic pastSixtySecondsStatistic = statisticsComponent.retriveAllStatisticsWithTimeGreaterThan();
 		
 		assertEquals(pastSixtySecondsStatistic.getAvg(), 56,0);
 		assertEquals(pastSixtySecondsStatistic.getMax(), 100,0);
@@ -153,7 +147,7 @@ public class StatisticsServiceTest {
 		assertEquals(pastSixtySecondsStatistic.getSum(), 280,0);
 		assertEquals(pastSixtySecondsStatistic.getCount(), 5,0);
 		
-		singletonStatisticsMap.getInstance().clear();
+		statisticsComponent.clear();
 	
 	}
 	

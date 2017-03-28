@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.pasquantonio.component.SingletonStatisticsMap;
+import br.com.pasquantonio.component.StatisticsComponent;
 import br.com.pasquantonio.model.Transaction;
-import br.com.pasquantonio.service.StatisticsService;
 import br.com.pasquantonio.service.TimeIntervalService;
 
 @RestController
@@ -20,10 +19,8 @@ import br.com.pasquantonio.service.TimeIntervalService;
 public class TransactionController {
 	
 	@Autowired	
-	private StatisticsService statisticsService;
+	private StatisticsComponent statisticsComponent;
 	
-	@Autowired
-	private SingletonStatisticsMap singletonStatisticsMap;
 	
 	@Autowired
 	private TimeIntervalService timeIntervalService;
@@ -34,12 +31,12 @@ public class TransactionController {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 		ResponseEntity<Object> responseEntity;
-		if(singletonStatisticsMap.getInstance().containsKey(transaction.getTime())){
+		if(statisticsComponent.containsKey(transaction.getTime())){
 			responseEntity = new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}else{
 			responseEntity = new ResponseEntity<>(HttpStatus.CREATED);
 		}
-		statisticsService.postTransaction(transaction, singletonStatisticsMap.getInstance());
+		statisticsComponent.postTransaction(transaction);
 		return responseEntity;
 	}
 
