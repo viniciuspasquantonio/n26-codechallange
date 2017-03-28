@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.time.Instant;
 
@@ -19,7 +20,7 @@ import br.com.pasquantonio.model.Transaction;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class StatisticsServiceTest {
+public class StatisticsComponentTest {
 
 	@Autowired
 	private StatisticsComponent statisticsComponent;
@@ -151,4 +152,17 @@ public class StatisticsServiceTest {
 	
 	}
 	
+	@Test
+	public void shouldRemoveObsoleteStatisticsAfterPost(){
+		long twoMinutesAgo = Instant.now().minusSeconds(120L).toEpochMilli();
+		Transaction twoMinutesAgoTransaction = new Transaction(twoMinutesAgo,90D);
+		
+		statisticsComponent.postTransaction(twoMinutesAgoTransaction);
+		
+		assertFalse(statisticsComponent.containsKey(twoMinutesAgo));
+		
+		statisticsComponent.clear();
+	}
+
+
 }

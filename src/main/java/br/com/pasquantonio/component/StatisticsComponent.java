@@ -31,8 +31,11 @@ public class StatisticsComponent {
 			statistic = statisticsMap.get(transaction.getTime());
 		}
 		statistic = transactionAccountantService.account(statistic, transaction);
+		if(!timeIntervalService.isInTimeInterval(transaction.getTime())){
+			return;
+		}
 		statisticsMap.put(transaction.getTime(), statistic);
-		
+		clearStatisticsNotInTimeInterval();
 	}
 
 
@@ -47,6 +50,7 @@ public class StatisticsComponent {
 	
 	public synchronized  void clearStatisticsNotInTimeInterval(){
 		statisticsMap = statisticsMap.tailMap(timeIntervalService.getGreaterTimeWithinTimeInterval());
+		
 	}
 
 	public synchronized boolean containsKey(long time) {
@@ -63,6 +67,9 @@ public class StatisticsComponent {
 	}
 
 	public synchronized void put(long time, Statistic accountedStatistic) {
+		if(!timeIntervalService.isInTimeInterval(time)){
+			return;
+		}
 		statisticsMap.put(time, accountedStatistic);
 		
 	}
