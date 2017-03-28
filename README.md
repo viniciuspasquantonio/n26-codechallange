@@ -10,33 +10,33 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them
 
-'''
+```
 Java 8
 Maven
-'''
+```
 
 ### Installing
 
 Clone the project and build the project with
 
-'''
+```
 mvn clean install
-'''
+```
 
 Start the application with
 
-'''
+```
 java -jar target/n26-0.0.1-SNAPSHOT.jar
 
-'''
+```
 
 End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
 
-'''
+```
 mvn test
-'''
+```
 
 ## Built With
 
